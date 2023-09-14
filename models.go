@@ -11,4 +11,11 @@ type TimeEntry struct {
 	StartTime string
 	EndTime   string
 	Summary   string
+	Exists    bool
+	Submitted bool
+	Error     error
+}
+
+func (te *TimeEntry) SetError(err error) {
+	te.Error = err
 }

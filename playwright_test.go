@@ -1,13 +1,14 @@
 package autotask
 
 import (
+	"os"
 	"testing"
 )
 
 func TestLogTimes(t *testing.T) {
 	at := NewAutoTaskPlaywright()
 
-	es := []TimeEntry{
+	es := []*TimeEntry{
 		{
 			TicketId:  279750,
 			Date:      "2023/09/13", // format to user locale
@@ -30,11 +31,11 @@ Duration: 0.75`,
 	}
 
 	creds := Credentials{
-		Username: "",
-		Password: "",
+		Username: os.Getenv("AUTOTASK_USERNAME"),
+		Password: os.Getenv("AUTOTASK_PASSWORD"),
 	}
 
-	err := at.LogTimes(es, creds, "chromium", false, false)
+	err := at.LogTimes(es, creds, "Philip Fourie", "chromium", false, false)
 
 	if err != nil {
 		t.Errorf("could not log times: %v", err)
