@@ -32,11 +32,9 @@ func logTimeEntriesByTicketId(page playwright.Page, ticketId int, entries autota
 
 	log.Println("Waiting for conversation details to load")
 
-	loadOpts := playwright.PageWaitForLoadStateOptions{
+	err = page.WaitForLoadState(playwright.PageWaitForLoadStateOptions{
 		State: playwright.LoadStateNetworkidle,
-	}
-
-	err = page.WaitForLoadState(loadOpts)
+	})
 	if err != nil {
 		return fmt.Errorf("logTimeEntries: could not find details: %v", err)
 	}
@@ -80,9 +78,9 @@ func logTimeEntry(page playwright.Page, te *autotask.TimeEntry) error {
 		return fmt.Errorf("logTimeEntry: could not find dialog: %v", err)
 	}
 
-	page.Locator("[data-eii='010000xs'] > input[type=text]").Fill(te.Date)                                                 // Date field
-	page.Locator("[data-eii='010000xt'] > input[type=text]").Fill(te.StartTime)                                            // Start Time
-	page.Locator("[data-eii='010000xu'] > input[type=text]").Fill(te.EndTime)                                              // End Time
+	page.Locator("[data-eii='010000xs'] > input[type=text]").Fill(te.DateStr)                                              // Date field
+	page.Locator("[data-eii='010000xt'] > input[type=text]").Fill(te.StartTimeStr)                                         // Start Time
+	page.Locator("[data-eii='010000xu'] > input[type=text]").Fill(te.EndTimeStr)                                           // End Time
 	summaryNotes := page.Locator("[data-eii='000001GK']  > div.Content2 > div.InputWrapper2 > div.ContentEditable2.Small") // Summary Notes
 	summaryNotes.Fill(te.Summary)
 

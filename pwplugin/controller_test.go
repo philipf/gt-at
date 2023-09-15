@@ -25,15 +25,27 @@ func TestLogTimes(t *testing.T) {
 		// 		},
 
 		{
-			Id:        278364,
-			IsTicket:  false,
-			Date:      "2023/09/14", // format to user locale
-			StartTime: "10:30",
-			EndTime:   "11:00",
-			Duration:  0.5,
+			Id:           278364,
+			IsTicket:     false,
+			DateStr:      "2023/09/14", // format to user locale
+			StartTimeStr: "10:30",
+			EndTimeStr:   "11:00",
+			Duration:     0.5,
 			Summary: `Start   End    Time   Notes
-10:29 - 11:10  00:40  10:30 stand-up
+10:29 - 11:10  00:40  10:30 Stand-up
 Duration: 0.75`,
+		},
+
+		{
+			Id:           278364,
+			IsTicket:     false,
+			DateStr:      "2023/09/11", // format to user locale
+			StartTimeStr: "15:54",
+			EndTimeStr:   "16:13",
+			Duration:     0.25,
+			Summary: `Start End Time Notes  
+15:54 - 16:13 00:18 Catch-up /w Jon, issues about SW caused by User Assigned Managed Identity and CMK  
+Duration: 0.25`,
 		},
 	}
 

@@ -21,3 +21,10 @@ func WeekNo(t time.Time) int {
 	// Get the week number
 	return int(daysPassed/7) + 2
 }
+
+func SundayOfTheWeek(t time.Time) time.Time {
+	// Subtract the weekday number from the given date.
+	// Since Sunday = 0 in time.Weekday, it gives the exact offset we need.
+	offset := int(t.Weekday())
+	return t.AddDate(0, 0, -offset)
+}

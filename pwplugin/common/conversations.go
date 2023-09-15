@@ -48,8 +48,8 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries aut
 					te.WeekPeerLocator = conv
 				}
 
-				if strings.HasPrefix(t, te.Date) {
-					log.Printf("Found date: %v\n", te.Date)
+				if strings.HasPrefix(t, te.DateStr) {
+					log.Printf("Found date: %v\n", te.DateStr)
 					te.Exists = true
 					continue
 				}

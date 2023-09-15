@@ -1,6 +1,9 @@
 package autotask
 
-import "sort"
+import (
+	"sort"
+	"time"
+)
 
 type Credentials struct {
 	Username string
@@ -10,9 +13,10 @@ type Credentials struct {
 type TimeEntry struct {
 	Id              int
 	IsTicket        bool // if not a ticket, it's a task
-	Date            string
-	StartTime       string
-	EndTime         string
+	Date            time.Time
+	DateStr         string
+	StartTimeStr    string
+	EndTimeStr      string
 	Summary         string
 	Exists          bool
 	Submitted       bool
@@ -30,9 +34,9 @@ type TimeEntries []*TimeEntry
 
 func (t TimeEntries) Len() int           { return len(t) }
 func (t TimeEntries) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t TimeEntries) Less(i, j int) bool { return t[i].Id < t[j].Id }
+func (t TimeEntries) Less(i, j int) bool { return t[i].Date.Before(t[j].Date) }
 
-func (t TimeEntries) SortById() {
+func (t TimeEntries) SortByDate() {
 	sort.Sort(t)
 }
 
@@ -45,6 +49,22 @@ func (a TimeEntries) DistinctIds() []int {
 			seen[entry.Id] = true
 			result = append(result, entry.Id)
 		}
+	}
+
+	return result
+}
+
+// DistinctWeekNos returns a slice of distinct week numbers
+func (a TimeEntries) DistinctWeekNos() []int {
+	seen := make(map[int]bool)
+	var result []int
+
+	for _, entry := range a {
+		if !seen[entry.WeekNo] {
+			seen[entry.WeekNo] = true
+			result = append(result, entry.WeekNo)
+		}
+
 	}
 
 	return result
@@ -72,6 +92,30 @@ func (a TimeEntries) ById(id int) TimeEntries {
 
 	for _, entry := range a {
 		if entry.Id == id {
+			entries = append(entries, entry)
+		}
+	}
+
+	return entries
+}
+
+// Group entries by WeekNo
+func (a TimeEntries) GroupByWeekNo() map[int]TimeEntries {
+	groups := make(map[int]TimeEntries)
+
+	for _, entry := range a {
+		groups[entry.WeekNo] = append(groups[entry.WeekNo], entry)
+	}
+
+	return groups
+}
+
+// Find all entries for a given Date
+func (a TimeEntries) ByDate(date time.Time) TimeEntries {
+	entries := make(TimeEntries, 0)
+
+	for _, entry := range a {
+		if entry.Date == date {
 			entries = append(entries, entry)
 		}
 	}

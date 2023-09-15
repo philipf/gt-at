@@ -28,11 +28,12 @@ func (atp *autoTaskPlaywright) LogTimes(
 
 	// loop through entries and set WeekNo
 	for i, te := range entries {
-		dt, err := time.Parse("2006/01/02", te.Date)
+		dt, err := time.Parse("2006/01/02", te.DateStr)
 		if err != nil {
 			return fmt.Errorf("could not parse date: %v", err)
 		}
 		entries[i].WeekNo = autotask.WeekNo(dt)
+		entries[i].Date = dt // TODO: create factory method for TimeEntry
 	}
 
 	log.Printf("Logging entries for a total of %v time entries\n", len(entries))
