@@ -1,4 +1,4 @@
-module gt-at
+module github.com/philipf/gt-at
 
 go 1.21.1
 
