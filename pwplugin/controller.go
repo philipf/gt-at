@@ -78,12 +78,6 @@ func (atp *autoTaskPlaywright) LogTimes(
 		log.Println("Dry run, skipping logTimeEntry")
 	}
 
-	if !dryRun {
-		err = servicedesk.LogTimeEntries(page, userDisplayName, tickets)
-	} else {
-		log.Println("Dry run, skipping logTimeEntry")
-	}
-
 	for _, te := range entries {
 		log.Printf("%+v\n", te)
 	}

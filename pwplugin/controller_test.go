@@ -11,18 +11,17 @@ func TestLogTimes(t *testing.T) {
 	at := NewAutoTaskPlaywright()
 
 	es := []*autotask.TimeEntry{
-		// 		{
-		// 			//TicketId:  279750,
-		// 			Id:        278364,
-		// 			IsTicket:  true,
-		// 			Date:      "2023/09/13", // format to user locale
-		// 			StartTime: "10:29",
-		// 			EndTime:   "11:10",
-		// 			Duration:  0.75,
-		// 			Summary: `Start   End    Time   Notes
-		// 10:29 - 11:10  00:40  10:30 stand-up
-		// Duration: 0.75`,
-		// 		},
+		{
+			Id:           279750,
+			IsTicket:     true,
+			DateStr:      "2023/09/13", // format to user locale
+			StartTimeStr: "10:29",
+			EndTimeStr:   "11:10",
+			Duration:     0.75,
+			Summary: `Start   End    Time   Notes
+		10:29 - 11:10  00:40  10:30 stand-up
+		Duration: 0.75`,
+		},
 
 		{
 			Id:           278364,
