@@ -16,21 +16,21 @@ func TestInferYear(t *testing.T) {
 			// When rangeStart and rangeEnd are in the same year.
 			month:          time.March,
 			windowInMonths: 4,
-			dt:             time.Date(2020, time.June, 1, 0, 0, 0, 0, time.UTC),
+			dt:             time.Date(2020, time.June, 1, 0, 0, 0, 0, time.Local),
 			expectedYear:   2020,
 		},
 		{
 			// When month is within the range of rangeStart.Month() and December.
 			month:          time.November,
 			windowInMonths: 6,
-			dt:             time.Date(2021, time.May, 1, 0, 0, 0, 0, time.UTC),
+			dt:             time.Date(2021, time.May, 1, 0, 0, 0, 0, time.Local),
 			expectedYear:   2020,
 		},
 		{
 			// When month is outside the above two conditions.
 			month:          time.February,
 			windowInMonths: 6,
-			dt:             time.Date(2022, time.July, 1, 0, 0, 0, 0, time.UTC),
+			dt:             time.Date(2022, time.July, 1, 0, 0, 0, 0, time.Local),
 			expectedYear:   2022,
 		},
 	}

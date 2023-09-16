@@ -117,7 +117,7 @@ func navigateToWeek(page playwright.Page, entryTime time.Time) error {
 
 		inferredYear := autotask.InferYear(firstParse.Month(), 3, time.Now())
 		//pageWeekStart, err := time.Parse("Mon 01/02/2006", fmt.Sprintf("%s/%d", s, inferredYear))
-		pageWeekStart := time.Date(inferredYear, firstParse.Month(), firstParse.Day(), 0, 0, 0, 0, time.UTC)
+		pageWeekStart := time.Date(inferredYear, firstParse.Month(), firstParse.Day(), 0, 0, 0, 0, time.Local)
 
 		if pageWeekStart.Year() == entryWeekStart.Year() &&
 			pageWeekStart.Month() == entryWeekStart.Month() &&

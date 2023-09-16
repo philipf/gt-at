@@ -3,7 +3,6 @@ package pwplugin
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/philipf/gt-at/autotask"
@@ -91,7 +90,7 @@ func ToYN(b bool) string {
 }
 
 func prettyPrint(entries autotask.TimeEntries) {
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(log.Writer())
 	table.SetHeader([]string{"Id", "IsTicket", "Date", "Start", "Time", "Exists", "Saved", "Error"})
 
 	for _, entry := range entries {

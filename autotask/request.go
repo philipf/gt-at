@@ -17,6 +17,7 @@ type RequestEntry struct {
 	StartTime string    `json:"startTime"`
 	Duration  float32   `json:"duration"`
 	Summary   string    `json:"summary"`
+	Project   string    `json:"project"`
 }
 
 func UnmarshalToRequestEntries(data []byte) ([]RequestEntry, error) {
@@ -36,7 +37,7 @@ func UnmarshalToTimeEntries(data []byte) (TimeEntries, error) {
 	var entries TimeEntries
 
 	for _, e := range r {
-		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTime, e.Duration, e.Summary)
+		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTime, e.Duration, e.Summary, e.Project)
 		entries = append(entries, te)
 	}
 

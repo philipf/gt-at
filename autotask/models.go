@@ -14,6 +14,7 @@ type TimeEntry struct {
 	StartTimeStr string
 	Duration     float32 // in hours
 	Summary      string
+	Project      string
 
 	Exists             bool
 	Submitted          bool
@@ -31,7 +32,8 @@ func NewEntry(id int,
 	date time.Time,
 	startTimeStr string,
 	duration float32,
-	summary string) *TimeEntry {
+	summary string,
+	project string) *TimeEntry {
 
 	e := &TimeEntry{
 		Id:           id,
@@ -41,6 +43,7 @@ func NewEntry(id int,
 		StartTimeStr: startTimeStr,
 		Duration:     duration,
 		Summary:      summary,
+		Project:      project,
 	}
 
 	e.calculateDerived()

@@ -23,7 +23,7 @@ func TestLogTimes(t *testing.T) {
 
 	es := []*autotask.TimeEntry{
 		autotask.NewEntry(266016, false, autotask.Date(2023, 9, 15), "10:30", 0.5,
-			"Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 Stand-up\nDuration: 0.75"),
+			"Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 Stand-up\nDuration: 0.75", "TestProject"),
 	}
 
 	creds := autotask.Credentials{
