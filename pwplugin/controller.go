@@ -3,8 +3,10 @@ package pwplugin
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/philipf/gt-at/autotask"
 	"github.com/philipf/gt-at/pwplugin/common"
 	"github.com/philipf/gt-at/pwplugin/projects"
@@ -34,6 +36,8 @@ func (atp *autoTaskPlaywright) LogTimes(
 		}
 		entries[i].WeekNo = autotask.WeekNo(dt)
 		entries[i].Date = dt // TODO: create factory method for TimeEntry
+		entries[i].CalculateDerivedDurations()
+
 	}
 
 	log.Printf("Logging entries for a total of %v time entries\n", len(entries))
@@ -78,13 +82,47 @@ func (atp *autoTaskPlaywright) LogTimes(
 		log.Println("Dry run, skipping logTimeEntry")
 	}
 
-	for _, te := range entries {
-		log.Printf("%+v\n", te)
-	}
+	prettyPrint(entries)
 
 	common.Logout(page)
 
 	log.Println("End of logTimes")
 
 	return nil
+}
+
+// receiver function to convert bool to Y/N
+func ToYN(b bool) string {
+	if b {
+		return "Y"
+	}
+	return "N"
+}
+
+func prettyPrint(entries autotask.TimeEntries) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Id", "IsTicket", "Date", "Start", "Time", "Exists", "Saved", "Error"})
+
+	for _, entry := range entries {
+		var errMsg string
+		if entry.Error != nil {
+			errMsg = "Y"
+		} else {
+			errMsg = ""
+		}
+
+		row := []string{
+			fmt.Sprintf("%d", entry.Id),
+			ToYN(entry.IsTicket),
+			entry.DateStr,
+			entry.StartTimeStr,
+			fmt.Sprintf("%.2f", entry.Duration),
+			ToYN(entry.Exists),
+			ToYN(entry.Submitted),
+			errMsg,
+		}
+		table.Append(row)
+	}
+
+	table.Render() // Sends output to stdout
 }

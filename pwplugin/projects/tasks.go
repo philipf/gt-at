@@ -1,9 +1,11 @@
 package projects
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/philipf/gt-at/autotask"
 	"github.com/philipf/gt-at/pwplugin/common"
@@ -82,7 +84,65 @@ func newWeekEntries(page playwright.Page, weekEntries autotask.TimeEntries) erro
 	if err := page.Locator("[data-eii='00000135']").Click(); err != nil {
 		return fmt.Errorf("newWeekEntries: could not click new time entry button: %v", err)
 	}
+
+	navigateToWeek(page, weekEntries[0].Date)
+
 	return captureWeekEntries(page, weekEntries)
+}
+
+func navigateToWeek(page playwright.Page, entryTime time.Time) error {
+	entryWeekStart := autotask.SundayOfTheWeek(entryTime)
+
+	for i := 0; i <= 3; i++ {
+
+		s, err := page.Locator("body > div.Dialog1.Dialog2.Normal.Active tr.Heading > td.TextCell div.Label").First().TextContent()
+
+		if err != nil {
+			return fmt.Errorf("navigateToWeek: could not find pageDateLabel: %v", err)
+		}
+
+		firstParse, _ := time.Parse("Mon 01/02", s)
+		if err != nil {
+			return fmt.Errorf("navigateToWeek: could not parse pageWeekStart: %v", err)
+		}
+
+		inferredYear := autotask.InferYear(firstParse.Month(), 3, time.Now())
+		//pageWeekStart, err := time.Parse("Mon 01/02/2006", fmt.Sprintf("%s/%d", s, inferredYear))
+		pageWeekStart := time.Date(inferredYear, firstParse.Month(), firstParse.Day(), 0, 0, 0, 0, time.UTC)
+
+		if pageWeekStart.Year() == entryWeekStart.Year() &&
+			pageWeekStart.Month() == entryWeekStart.Month() &&
+			pageWeekStart.Day() == entryWeekStart.Day() {
+			return nil
+
+		} else if entryWeekStart.Before(pageWeekStart) {
+			err = gotoPrevWeek(page, err)
+			if err != nil {
+				return fmt.Errorf("navigateToNextDay: could not find load indicator: %v", err)
+			}
+		} else {
+			err = gotoNextWeek(page, err)
+			if err != nil {
+				return fmt.Errorf("navigateToNextDay: could not find load indicator: %v", err)
+			}
+		}
+	}
+
+	return errors.New("navigateToWeek: could not find week")
+}
+
+func gotoNextWeek(page playwright.Page, err error) error {
+	loadIndicator := "#LoadingIndicator.Active"
+	page.Locator("body > div.Dialog1.Dialog2.Normal.Active .MoveRight").Click()
+	err = page.Locator(loadIndicator).WaitFor(playwright.LocatorWaitForOptions{State: playwright.WaitForSelectorStateDetached})
+	return err
+}
+
+func gotoPrevWeek(page playwright.Page, err error) error {
+	loadIndicator := "#LoadingIndicator.Active"
+	page.Locator("body > div.Dialog1.Dialog2.Normal.Active .MoveLeft").Click()
+	err = page.Locator(loadIndicator).WaitFor(playwright.LocatorWaitForOptions{State: playwright.WaitForSelectorStateDetached})
+	return err
 }
 
 func editWeekEntries(page playwright.Page, weekEntries autotask.TimeEntries, peer *autotask.TimeEntry) error {
@@ -125,40 +185,44 @@ func captureWeekEntries(page playwright.Page, weekEntries autotask.TimeEntries) 
 	// Capture each week day's time if it exists
 	sunday := autotask.SundayOfTheWeek(weekEntries[0].Date)
 
+	entriesCaptured := 0
+
 	for i := 0; i < 7; i++ {
 		// Find the time entry for the current day
-		entries := weekEntries.ByDate(sunday.AddDate(0, 0, i))
+		entry := weekEntries.ByDate(sunday.AddDate(0, 0, i))
 
-		if len(entries) > 1 {
-			for _, e := range entries {
+		if len(entry) > 1 {
+			for _, e := range entry {
 				e.SetError(fmt.Errorf("newWeekEntries: more than one entry for a given day: %v", sunday))
 			}
-		} else if len(entries) == 0 {
+		} else if len(entry) == 0 {
 			// No time entry for this day, skip to the next day
 		} else {
-			te := entries[0]
+			te := entry[0]
 			err = captureDay(page, te)
 			if err != nil {
 				te.SetError(fmt.Errorf("newWeekEntries: could not capture day: %v", err))
 			}
+			entriesCaptured++
 		}
 
-		if i < 6 {
-			err := navigateToNextDay(page)
-			if err != nil {
-				return fmt.Errorf("newWeekEntries: could not navigate to next day: %v", err)
-			}
-		} else {
+		if i >= 6 || entriesCaptured >= len(weekEntries) {
 			err := saveWeek(page)
 			if err != nil {
 				return fmt.Errorf("newWeekEntries: could not save week: %v", err)
+			}
+			break
+		} else {
+			err := navigateToNextDay(page)
+			if err != nil {
+				return fmt.Errorf("newWeekEntries: could not navigate to next day: %v", err)
 			}
 		}
 	}
 
 	// Mark all entries as submitted
 	for _, te := range weekEntries {
-		if te.Error != nil {
+		if te.Error == nil {
 			te.Submitted = true
 		}
 	}
@@ -191,7 +255,7 @@ func saveWeek(page playwright.Page) error {
 		return fmt.Errorf("saveWeek: could not click ok button: %v", err)
 	}
 
-	weekEntryDialog := page.Locator("body > div.Dialog1.Dialog2.Normal.Active").Last()
+	weekEntryDialog := page.Locator("body > div.Dialog1.Dialog2.Normal.Active").First()
 
 	saveAndCloseButton := page.Locator("[data-eii='010000p7']") // Save and Close button
 	err = saveAndCloseButton.Click()

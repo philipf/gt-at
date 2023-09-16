@@ -78,11 +78,30 @@ func logTimeEntry(page playwright.Page, te *autotask.TimeEntry) error {
 		return fmt.Errorf("logTimeEntry: could not find dialog: %v", err)
 	}
 
-	page.Locator("[data-eii='010000xs'] > input[type=text]").Fill(te.DateStr)                                              // Date field
-	page.Locator("[data-eii='010000xt'] > input[type=text]").Fill(te.StartTimeStr)                                         // Start Time
-	page.Locator("[data-eii='010000xu'] > input[type=text]").Fill(te.EndTimeStr)                                           // End Time
+	if err := page.Locator("[data-eii='010000xs'] > input[type=text]").Fill(te.DateStr); err != nil {
+		return fmt.Errorf("logTimeEntry: could not fill date: %v", err)
+	}
+	if err := page.Locator("[data-eii='010000xt'] > input[type=text]").Fill(te.StartTimeStr); err != nil {
+		return fmt.Errorf("logTimeEntry: could not fill start time: %v", err)
+	}
+	// if err := page.Locator("[data-eii='010000xu'] > input[type=text]").Fill(te.EndTimeStr); err != nil {
+	// 	return fmt.Errorf("logTimeEntry: could not fill end time: %v", err)
+	//}
+
+	inputs := page.Locator("[data-eii='000001GH'] input[type='text']") // Duration
+
+	if err := inputs.First().Fill(te.DurationHoursStr); err != nil {
+		return fmt.Errorf("logTimeEntry: could not fill hours: %v", err)
+	}
+
+	if err := inputs.Nth(1).Fill(te.DurationMinutesStr); err != nil {
+		return fmt.Errorf("logTimeEntry: could not fill minutes: %v", err)
+	}
+
 	summaryNotes := page.Locator("[data-eii='000001GK']  > div.Content2 > div.InputWrapper2 > div.ContentEditable2.Small") // Summary Notes
-	summaryNotes.Fill(te.Summary)
+	if err := summaryNotes.Fill(te.Summary); err != nil {
+		return fmt.Errorf("logTimeEntry: could not fill summary: %v", err)
+	}
 
 	page.WaitForTimeout(1000)
 

@@ -2,6 +2,7 @@ package autotask
 
 import (
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -11,20 +12,40 @@ type Credentials struct {
 }
 
 type TimeEntry struct {
-	Id              int
-	IsTicket        bool // if not a ticket, it's a task
-	Date            time.Time
-	DateStr         string
-	StartTimeStr    string
-	EndTimeStr      string
-	Summary         string
-	Exists          bool
-	Submitted       bool
-	Error           error
-	Duration        float32 // in hours
-	WeekNo          int
-	WeekPeerLocator interface{}
+	Id                 int
+	IsTicket           bool // if not a ticket, it's a task
+	Date               time.Time
+	DateStr            string
+	StartTimeStr       string
+	EndTimeStr         string
+	Summary            string
+	Exists             bool
+	Submitted          bool
+	Error              error
+	Duration           float32 // in hours
+	DurationHours      int
+	DurationMinutes    float32
+	DurationHoursStr   string
+	DurationMinutesStr string
+	WeekNo             int
+	WeekPeerLocator    interface{}
 }
+
+func (te *TimeEntry) CalculateDerivedDurations() {
+	// Calculate DurationHours
+	te.DurationHours = int(te.Duration)
+
+	// Calculate DurationMinutes
+	te.DurationMinutes = (te.Duration - float32(te.DurationHours)) * 60
+
+	// Round DurationMinutes to nearest minute
+	te.DurationMinutes = float32(int(te.DurationMinutes + 0.5))
+
+	// Convert DurationHours and DurationMinutes to string
+	te.DurationHoursStr = strconv.Itoa(te.DurationHours)
+	te.DurationMinutesStr = strconv.Itoa(int(te.DurationMinutes))
+}
+
 
 func (te *TimeEntry) SetError(err error) {
 	te.Error = err

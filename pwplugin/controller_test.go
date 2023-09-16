@@ -19,8 +19,8 @@ func TestLogTimes(t *testing.T) {
 			EndTimeStr:   "11:10",
 			Duration:     0.75,
 			Summary: `Start   End    Time   Notes
-		10:29 - 11:10  00:40  10:30 stand-up
-		Duration: 0.75`,
+10:29 - 11:10  00:40  10:30 stand-up
+Duration: 0.75`,
 		},
 
 		{
@@ -38,7 +38,7 @@ Duration: 0.75`,
 		{
 			Id:           278364,
 			IsTicket:     false,
-			DateStr:      "2023/09/11", // format to user locale
+			DateStr:      "2023/09/17", // format to user locale
 			StartTimeStr: "15:54",
 			EndTimeStr:   "16:13",
 			Duration:     0.25,

@@ -28,3 +28,22 @@ func SundayOfTheWeek(t time.Time) time.Time {
 	offset := int(t.Weekday())
 	return t.AddDate(0, 0, -offset)
 }
+
+func FormatShortDate(t time.Time) string {
+	return t.Format("Mon 01/02")
+}
+
+func InferYear(month time.Month, windowInMonths int, dt time.Time) int {
+	rangeStart := dt.AddDate(0, -windowInMonths, 0)
+	rangeEnd := dt.AddDate(0, windowInMonths, 0)
+
+	if rangeStart.Year() == rangeEnd.Year() {
+		return rangeStart.Year()
+	}
+
+	if month >= rangeStart.Month() && month <= time.December {
+		return rangeStart.Year()
+	}
+
+	return rangeEnd.Year()
+}
