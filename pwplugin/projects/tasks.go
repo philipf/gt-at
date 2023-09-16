@@ -240,6 +240,7 @@ func captureWeekEntries(page playwright.Page, weekEntries autotask.TimeEntries) 
 }
 
 func captureDay(page playwright.Page, te *autotask.TimeEntry) error {
+	log.Printf("Logging time entry: %+v\n", te)
 	err := page.Locator("[data-eii='0100014M']").Fill(strconv.FormatFloat(float64(te.Duration), 'f', -1, 32))
 	if err != nil {
 		return fmt.Errorf("newWeekEntries: could not fill in duration: %v", err)

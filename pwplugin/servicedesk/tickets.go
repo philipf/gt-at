@@ -72,6 +72,7 @@ func logTimeEntriesByTicketId(page playwright.Page, ticketId int, entries autota
 }
 
 func logTimeEntry(page playwright.Page, te *autotask.TimeEntry) error {
+	log.Printf("Logging time entry: %+v\n", te)
 	if !te.IsTicket {
 		return fmt.Errorf("logTimeEntry: only ticket time entries are supported")
 	}

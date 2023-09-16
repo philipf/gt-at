@@ -147,14 +147,14 @@ func (a TimeEntries) GroupByWeekNo() map[int]TimeEntries {
 }
 
 // Find all entries for a given Date
-func (a TimeEntries) ByDate(date time.Time) TimeEntries {
-	entries := make(TimeEntries, 0)
+func (entries TimeEntries) ByDate(date time.Time) TimeEntries {
+	result := make(TimeEntries, 0)
 
-	for _, entry := range a {
+	for _, entry := range entries {
 		if entry.Date == date {
-			entries = append(entries, entry)
+			result = append(result, entry)
 		}
 	}
 
-	return entries
+	return result
 }

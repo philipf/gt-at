@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/philipf/gt-at/autotask"
 	"github.com/philipf/gt-at/pwplugin/common"
 	"github.com/philipf/gt-at/pwplugin/projects"
@@ -72,47 +71,11 @@ func (atp *autoTaskPlaywright) LogTimes(
 		log.Println("Dry run, skipping logTimeEntry")
 	}
 
-	prettyPrint(entries)
+	entries.PrintSummary()
 
 	common.Logout(page)
 
 	log.Println("End of logTimes")
 
 	return nil
-}
-
-// receiver function to convert bool to Y/N
-func ToYN(b bool) string {
-	if b {
-		return "Y"
-	}
-	return "N"
-}
-
-func prettyPrint(entries autotask.TimeEntries) {
-	table := tablewriter.NewWriter(log.Writer())
-	table.SetHeader([]string{"Id", "IsTicket", "Date", "Start", "Time", "Exists", "Saved", "Error"})
-
-	for _, entry := range entries {
-		var errMsg string
-		if entry.Error != nil {
-			errMsg = "Y"
-		} else {
-			errMsg = ""
-		}
-
-		row := []string{
-			fmt.Sprintf("%d", entry.Id),
-			ToYN(entry.IsTicket),
-			entry.DateStr,
-			entry.StartTimeStr,
-			fmt.Sprintf("%.2f", entry.Duration),
-			ToYN(entry.Exists),
-			ToYN(entry.Submitted),
-			errMsg,
-		}
-		table.Append(row)
-	}
-
-	table.Render() // Sends output to stdout
 }
