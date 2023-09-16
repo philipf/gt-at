@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/philipf/gt-at/autotask"
@@ -27,18 +26,6 @@ func (atp *autoTaskPlaywright) LogTimes(
 	userDisplayName string,
 	browserType string,
 	headless, dryRun bool) error {
-
-	// loop through entries and set WeekNo
-	for i, te := range entries {
-		dt, err := time.Parse("2006/01/02", te.DateStr)
-		if err != nil {
-			return fmt.Errorf("could not parse date: %v", err)
-		}
-		entries[i].WeekNo = autotask.WeekNo(dt)
-		entries[i].Date = dt // TODO: create factory method for TimeEntry
-		entries[i].CalculateDerivedDurations()
-
-	}
 
 	log.Printf("Logging entries for a total of %v time entries\n", len(entries))
 

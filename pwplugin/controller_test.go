@@ -11,41 +11,14 @@ func TestLogTimes(t *testing.T) {
 	at := NewAutoTaskPlaywright()
 
 	es := []*autotask.TimeEntry{
-		{
-			Id:           279750,
-			IsTicket:     true,
-			DateStr:      "2023/09/13", // format to user locale
-			StartTimeStr: "10:29",
-			EndTimeStr:   "11:10",
-			Duration:     0.75,
-			Summary: `Start   End    Time   Notes
-10:29 - 11:10  00:40  10:30 stand-up
-Duration: 0.75`,
-		},
+		autotask.NewEntry(279750, true, autotask.Date(2023, 9, 13), "10:29", 0.75,
+			"Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 stand-up\nDuration: 0.75"),
 
-		{
-			Id:           278364,
-			IsTicket:     false,
-			DateStr:      "2023/09/14", // format to user locale
-			StartTimeStr: "10:30",
-			EndTimeStr:   "11:00",
-			Duration:     0.5,
-			Summary: `Start   End    Time   Notes
-10:29 - 11:10  00:40  10:30 Stand-up
-Duration: 0.75`,
-		},
+		autotask.NewEntry(278364, false, autotask.Date(2023, 9, 13), "10:30", 0.5,
+			"Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 Stand-up\nDuration: 0.75"),
 
-		{
-			Id:           278364,
-			IsTicket:     false,
-			DateStr:      "2023/09/17", // format to user locale
-			StartTimeStr: "15:54",
-			EndTimeStr:   "16:13",
-			Duration:     0.25,
-			Summary: `Start End Time Notes  
-15:54 - 16:13 00:18 Catch-up /w Jon, issues about SW caused by User Assigned Managed Identity and CMK  
-Duration: 0.25`,
-		},
+		autotask.NewEntry(278364, false, autotask.Date(2023, 9, 17), "15:54", 0.25,
+			"Start   End    Time   Notes\n15:54 - 16:13 00:18 Catch-up /w Jon, issues about SW caused by User Assigned Managed Identity and CMK\nDuration: 0.25"),
 	}
 
 	creds := autotask.Credentials{

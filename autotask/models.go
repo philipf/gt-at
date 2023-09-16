@@ -6,23 +6,18 @@ import (
 	"time"
 )
 
-type Credentials struct {
-	Username string
-	Password string
-}
-
 type TimeEntry struct {
-	Id                 int
-	IsTicket           bool // if not a ticket, it's a task
-	Date               time.Time
-	DateStr            string
-	StartTimeStr       string
-	EndTimeStr         string
-	Summary            string
+	Id           int
+	IsTicket     bool // if not a ticket, it's a task
+	Date         time.Time
+	DateStr      string
+	StartTimeStr string
+	Duration     float32 // in hours
+	Summary      string
+
 	Exists             bool
 	Submitted          bool
 	Error              error
-	Duration           float32 // in hours
 	DurationHours      int
 	DurationMinutes    float32
 	DurationHoursStr   string
@@ -31,21 +26,38 @@ type TimeEntry struct {
 	WeekPeerLocator    interface{}
 }
 
-func (te *TimeEntry) CalculateDerivedDurations() {
-	// Calculate DurationHours
-	te.DurationHours = int(te.Duration)
+func NewEntry(id int,
+	isTicket bool,
+	date time.Time,
+	startTimeStr string,
+	duration float32,
+	summary string) *TimeEntry {
 
-	// Calculate DurationMinutes
-	te.DurationMinutes = (te.Duration - float32(te.DurationHours)) * 60
+	e := &TimeEntry{
+		Id:           id,
+		IsTicket:     isTicket,
+		Date:         date,
+		DateStr:      date.Format("2006-01-02"),
+		StartTimeStr: startTimeStr,
+		Duration:     duration,
+		Summary:      summary,
+	}
 
-	// Round DurationMinutes to nearest minute
-	te.DurationMinutes = float32(int(te.DurationMinutes + 0.5))
+	e.calculateDerived()
 
-	// Convert DurationHours and DurationMinutes to string
-	te.DurationHoursStr = strconv.Itoa(te.DurationHours)
-	te.DurationMinutesStr = strconv.Itoa(int(te.DurationMinutes))
+	return e
 }
 
+func (te *TimeEntry) calculateDerived() {
+	te.DurationHours = int(te.Duration)
+	te.DurationMinutes = (te.Duration - float32(te.DurationHours)) * 60
+	te.DurationMinutes = float32(int(te.DurationMinutes + 0.5)) // Round DurationMinutes to nearest minute
+	te.DurationHoursStr = strconv.Itoa(te.DurationHours)
+	te.DurationMinutesStr = strconv.Itoa(int(te.DurationMinutes))
+
+	te.WeekNo = WeekNo(te.Date)
+	te.DateStr = te.Date.Format("2006/01/02")
+}
 
 func (te *TimeEntry) SetError(err error) {
 	te.Error = err

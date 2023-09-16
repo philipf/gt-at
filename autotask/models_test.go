@@ -32,7 +32,7 @@ func TestCalculateDerivedDurations(t *testing.T) {
 			WeekPeerLocator: nil,
 		}
 
-		te.CalculateDerivedDurations()
+		te.calculateDerived()
 
 		if te.DurationHours != test.expectedHours {
 			t.Errorf("Expected DurationHours: %d, but got %d for Duration: %f", test.expectedHours, te.DurationHours, test.duration)

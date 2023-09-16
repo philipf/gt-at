@@ -1,0 +1,26 @@
+[
+    {
+        "id": 279750,
+        "isTicket": true,
+        "date": "2023-09-13T00:00:00Z",
+        "startTimeStr": "10:29",
+        "duration": 0.75,
+        "summary": "Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 stand-up\nDuration: 0.75"
+    },
+    {
+        "id": 278364,
+        "isTicket": false,
+        "date": "2023-09-13T00:00:00Z",
+        "startTimeStr": "10:30",
+        "duration": 0.5,
+        "summary": "Start   End    Time   Notes\n10:29 - 11:10  00:40  10:30 Stand-up\nDuration: 0.75"
+    },
+    {
+        "id": 278364,
+        "isTicket": false,
+        "date": "2023-09-17T00:00:00Z",
+        "startTimeStr": "15:54",
+        "duration": 0.25,
+        "summary": "Start   End    Time   Notes\n15:54 - 16:13 00:18 Catch-up /w Jon, issues about SW caused by User Assigned Managed Identity and CMK\nDuration: 0.25"
+    }
+]
