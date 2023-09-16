@@ -33,10 +33,20 @@ func logTimeEntriesByTicketId(page playwright.Page, ticketId int, entries autota
 	log.Println("Waiting for conversation details to load")
 
 	err = page.WaitForLoadState(playwright.PageWaitForLoadStateOptions{
-		State: playwright.LoadStateNetworkidle,
+		State:   playwright.LoadStateNetworkidle,
+		Timeout: playwright.Float(5000),
 	})
+
+	if alertVisible, _ := page.Locator("#AlertDialog.Active").IsVisible(); alertVisible {
+		page.Locator("#AlertDialogOkayButton").Click()
+	}
+
 	if err != nil {
-		return fmt.Errorf("logTimeEntries: could not find details: %v", err)
+		if playwright.TimeoutError.Is(err) {
+			log.Println("Timeout waiting for first conversation details to load")
+		} else {
+			return fmt.Errorf("logTimeEntries: could not find details: %v", err)
+		}
 	}
 	log.Println("Conversations Loaded")
 

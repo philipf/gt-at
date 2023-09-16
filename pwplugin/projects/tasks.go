@@ -37,11 +37,20 @@ func logTimeEntriesByTaskId(page playwright.Page, taskId int, entries autotask.T
 	log.Println("Waiting for first conversation details to load")
 
 	err = page.WaitForLoadState(playwright.PageWaitForLoadStateOptions{
-		State: playwright.LoadStateNetworkidle,
+		State:   playwright.LoadStateNetworkidle,
+		Timeout: playwright.Float(5000),
 	})
 
+	if alertVisible, _ := page.Locator("#AlertDialog.Active").IsVisible(); alertVisible {
+		page.Locator("#AlertDialogOkayButton").Click()
+	}
+
 	if err != nil {
-		return fmt.Errorf("logTimeEntries: could not find details: %v", err)
+		if playwright.TimeoutError.Is(err) {
+			log.Println("Timeout waiting for first conversation details to load")
+		} else {
+			return fmt.Errorf("logTimeEntries: could not find details: %v", err)
+		}
 	}
 	log.Println("Conversations Loaded")
 
@@ -306,8 +315,9 @@ func navigateToNextDay(page playwright.Page) error {
 func findWeekEntryPeer(entriesById autotask.TimeEntries, te *autotask.TimeEntry) *autotask.TimeEntry {
 	weekNo := te.WeekNo
 
+	// other existing entries exist for the this week!!!
 	for _, e := range entriesById {
-		if e.WeekNo == weekNo && e.Exists {
+		if e.WeekNo == weekNo && e.WeekPeerLocator != nil {
 			return te
 		}
 	}

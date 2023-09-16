@@ -31,9 +31,15 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		creds := autotask.Credentials{
+			Username: os.Getenv("AUTOTASK_USERNAME"),
+			Password: os.Getenv("AUTOTASK_PASSWORD"),
+		}
+
 		err := load(jsonfile, autotask.LoadOptions{
 			DryRun:          false,
 			UserDisplayName: username,
+			Credentials:     creds,
 		})
 		if err != nil {
 			fmt.Println(err)

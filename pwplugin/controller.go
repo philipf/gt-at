@@ -40,6 +40,10 @@ func (atp *autoTaskPlaywright) LogTimes(
 		//BaseURL: &baseURL,
 	})
 
+	if err != nil {
+		log.Fatalf("could not create context: %v", err)
+	}
+
 	page, err := context.NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)

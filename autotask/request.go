@@ -11,12 +11,12 @@ type Credentials struct {
 }
 
 type RequestEntry struct {
-	Id           int       `json:"id"`
-	IsTicket     bool      `json:"isTicket"`
-	Date         time.Time `json:"date"`
-	StartTimeStr string    `json:"startTimeStr"`
-	Duration     float32   `json:"duration"`
-	Summary      string    `json:"summary"`
+	Id        int       `json:"id"`
+	IsTicket  bool      `json:"isTicket"`
+	Date      time.Time `json:"date"`
+	StartTime string    `json:"startTime"`
+	Duration  float32   `json:"duration"`
+	Summary   string    `json:"summary"`
 }
 
 func UnmarshalToRequestEntries(data []byte) ([]RequestEntry, error) {
@@ -36,7 +36,7 @@ func UnmarshalToTimeEntries(data []byte) (TimeEntries, error) {
 	var entries TimeEntries
 
 	for _, e := range r {
-		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTimeStr, e.Duration, e.Summary)
+		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTime, e.Duration, e.Summary)
 		entries = append(entries, te)
 	}
 
