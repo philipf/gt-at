@@ -58,13 +58,13 @@ func (atp *autoTaskPlaywright) LogTimes(
 		err = servicedesk.LogTimeEntries(page, userDisplayName, tickets)
 
 		if err != nil {
-			return fmt.Errorf("could not log tickets: %v", err)
+			fmt.Printf("could not log tickets: %v\n", err)
 		}
 
 		err = projects.LogTimeEntries(page, userDisplayName, tasks)
 
 		if err != nil {
-			return fmt.Errorf("could not log tasks: %v", err)
+			fmt.Printf("could not log tasks: %v\n", err)
 		}
 
 	} else {
