@@ -9,7 +9,8 @@ import (
 )
 
 func LogIntoAutoTask(page playwright.Page, user, password string) error {
-	_, err := page.Goto(autotask.URI_LOGIN)
+	_, err := page.Goto("")
+	// _, err := page.Goto(autotask.URI_LOGIN)
 	if err != nil {
 		return fmt.Errorf("could not goto: %v", err)
 	}
