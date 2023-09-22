@@ -39,7 +39,7 @@ func NewEntry(id int,
 		Id:           id,
 		IsTicket:     isTicket,
 		Date:         date,
-		DateStr:      date.Format("2006-01-02"),
+		DateStr:      date.Format("2006/01/02"),
 		StartTimeStr: startTimeStr,
 		Duration:     duration,
 		Summary:      summary,
@@ -59,7 +59,6 @@ func (te *TimeEntry) calculateDerived() {
 	te.DurationMinutesStr = strconv.Itoa(int(te.DurationMinutes))
 
 	te.WeekNo = WeekNo(te.Date)
-	te.DateStr = te.Date.Format("2006/01/02")
 }
 
 func (te *TimeEntry) SetError(err error) {

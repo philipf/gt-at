@@ -167,19 +167,25 @@ func logout(page playwright.Page) {
 		log.Printf("could not click profile logout: %v\n", err)
 	}
 
-	err = page.Locator("[data-eii='03000043']").WaitFor() // radio button" No, leave my Status as In
+	setStatusOutLocatorCloseButton := page.Locator("div.Dialog1 div.DialogTitleBarIcon")
+	setStatusOutLocatorCloseButton.WaitFor(playwright.LocatorWaitForOptions{
+		Timeout: playwright.Float(2 * 1000),
+	})
+
 	if err != nil {
-		log.Printf("could not find radio button: %v\n", err)
+		log.Printf("could not find status out (WaitFor): %v\n", err)
 	}
 
-	err = page.Locator("[data-eii='03000043']").Click()
+	setStatusOut, err := setStatusOutLocatorCloseButton.IsVisible()
 	if err != nil {
-		log.Printf("could not click radio button: %v\n", err)
+		log.Printf("could not find status out (IsVisible): %v\n", err)
 	}
 
-	err = page.Locator("[data-eii='05008CnG']").Click() // Ok button on logout
-	if err != nil {
-		log.Printf("could not click logout button: %v\n", err)
+	if setStatusOut {
+		err = setStatusOutLocatorCloseButton.Click()
+		if err != nil {
+			log.Printf("could not click status out: %v\n", err)
+		}
 	}
 
 	log.Println("Waiting for logout to complete")

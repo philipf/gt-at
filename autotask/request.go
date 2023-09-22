@@ -33,7 +33,6 @@ func UnmarshalToTimeEntries(data []byte) (TimeEntries, error) {
 		return nil, err
 	}
 
-	// create a slice of TimeEntry from the RequestEntry slice
 	var entries TimeEntries
 
 	for _, e := range r {
