@@ -34,58 +34,67 @@ func (atp *autoTaskPlaywright) LogTimes(
 		return fmt.Errorf("could not init playwright: %v", err)
 	}
 
-	page, err := navigateToAutoTask(browser, creds)
+	ctx, err := browser.NewContext(playwright.BrowserNewContextOptions{
+		//BaseURL: autotask.BaseURL,
+	})
 
-	// err = common.LogIntoAutoTask(page, creds.Username, creds.Password)
-	// if err != nil {
-	// 	return fmt.Errorf("could not log into autotask: %v", err)
-	// }
+	if err != nil {
+		return fmt.Errorf("could not create context: %v", err)
+	}
 
-	//logEntries(entries, dryRun, page, userDisplayName)
+	page, err := ctx.NewPage()
+	if err != nil {
+		log.Fatalf("could not create page: %v", err)
+	}
 
-	err = page.WaitForURL("*"+autotask.URI_LANDING, playwright.PageWaitForURLOptions{
+	err = gotoAutoTask(page, creds.Username)
+	if err != nil {
+		return fmt.Errorf("could not goto autotask: %v", err)
+	}
+
+	loginToEntra(page, creds.Username, creds.Password)
+
+	log.Println("Log in progress, MFA might be required, waiting for AT Landing Page to load")
+
+	err = page.WaitForURL("*"+autotask.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
 		Timeout: playwright.Float(120 * 1000),
 	})
 
-	newURL, _ := getBaseURL(page.URL())
+	if err != nil {
+		return fmt.Errorf("could not wait for url: %v", err)
+	}
 
-	fmt.Println(newURL)
+	log.Println("logged in")
 
-	common.Logout(page)
+	autotask.BaseURL = getBaseURL(page.URL())
+
+	logEntries(entries, dryRun, page, userDisplayName)
+	entries.PrintSummary()
+
+	logout(page)
 
 	log.Println("End of logTimes")
 
 	return nil
 }
 
-func navigateToAutoTask(browser playwright.Browser, creds autotask.Credentials) (playwright.Page, error) {
-	context, err := browser.NewContext()
+func gotoAutoTask(page playwright.Page, username string) error {
+	_, err := page.Goto(autotask.URI_AUTOTASK)
 
 	if err != nil {
-		log.Fatalf("could not create context: %v", err)
+		return err
 	}
 
-	page, err := context.NewPage()
+	err = page.WaitForURL("*Authentication.mvc*")
 	if err != nil {
-		log.Fatalf("could not create page: %v", err)
+		return err
 	}
 
-	// context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-	// 	//BaseURL: &baseURL,
-	// })
-
-	_, err = page.Goto(autotask.URI_AUTOTASK)
-
-	if err != nil {
-		return nil, err
-	}
-
-	page.WaitForURL("*Authentication.mvc*")
 	usernameInput := page.GetByRole("textbox")
-	usernameInput.Fill(creds.Username)
+	usernameInput.Fill(username)
 	usernameInput.Press("Enter")
 
-	return page, nil
+	return nil
 }
 
 func logEntries(entries autotask.TimeEntries,
@@ -110,17 +119,71 @@ func logEntries(entries autotask.TimeEntries,
 	} else {
 		log.Println("Dry run, skipping logTimeEntry")
 	}
-
-	entries.PrintSummary()
 }
 
-func getBaseURL(rawURL string) (string, error) {
+func getBaseURL(rawURL string) string {
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return "", err
+		log.Printf("could not parse url: %v\n", err)
+		return ""
 	}
 
 	baseURL := u.Scheme + "://" + u.Host
-	//fmt.Println(baseURL)
-	return baseURL, nil
+	return baseURL
+}
+
+func loginToEntra(page playwright.Page, user, password string) {
+	if user != "" {
+		// auto fill if available
+		page.Locator("#i0116").Fill(user)    // Username
+		page.Locator("#idSIButton9").Click() // Click Next button
+	}
+
+	if password != "" {
+		// auto fill if available
+		page.Locator("#i0118").Fill(password) // Password
+		page.Locator("#idSIButton9").Click()  // Click Sign In button
+	}
+}
+
+func logout(page playwright.Page) {
+	log.Println("Logging out")
+	page.Goto(fmt.Sprintf(autotask.URI_LANDING, autotask.BaseURL))
+
+	page.WaitForURL("*"+autotask.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
+		WaitUntil: playwright.WaitUntilStateLoad,
+		Timeout:   playwright.Float(5 * 1000),
+	})
+
+	log.Println("Landing page loaded")
+
+	err := page.Locator("[data-eii='05008GVH']").Hover() //hover to enable elements below
+	if err != nil {
+		log.Printf("could not hover over profile: %v\n", err)
+	}
+
+	err = page.Locator("[data-eii='0100014V']").Click() // profile logout
+	if err != nil {
+		log.Printf("could not click profile logout: %v\n", err)
+	}
+
+	err = page.Locator("[data-eii='03000043']").WaitFor() // radio button" No, leave my Status as In
+	if err != nil {
+		log.Printf("could not find radio button: %v\n", err)
+	}
+
+	err = page.Locator("[data-eii='03000043']").Click()
+	if err != nil {
+		log.Printf("could not click radio button: %v\n", err)
+	}
+
+	err = page.Locator("[data-eii='05008CnG']").Click() // Ok button on logout
+	if err != nil {
+		log.Printf("could not click logout button: %v\n", err)
+	}
+
+	log.Println("Waiting for logout to complete")
+	page.WaitForURL("*Authentication.mvc*")
+
+	log.Println("Logged out")
 }

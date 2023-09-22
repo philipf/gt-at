@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 	Long:  `Go Time - AutoTasker is a tool to help you track your time in AutoTask.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gt-at version 0.0.2")
+		fmt.Println("gt-at version 0.0.3")
 
 		// Make sure the json file exists
 		if _, err := os.Stat(jsonfile); os.IsNotExist(err) {

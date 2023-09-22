@@ -28,7 +28,7 @@ func LogTimeEntries(page playwright.Page, userDisplayName string, entries autota
 }
 
 func logTimeEntriesByTaskId(page playwright.Page, taskId int, entries autotask.TimeEntries, userDisplayName string) error {
-	_, err := page.Goto(fmt.Sprintf(autotask.URI_TASK_DETAIL, taskId))
+	_, err := page.Goto(fmt.Sprintf(autotask.URI_TASK_DETAIL, autotask.BaseURL, taskId))
 
 	if err != nil {
 		log.Fatalf("logTimeEntries: could not goto taskDetailUri: %v", err)

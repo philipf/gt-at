@@ -1,12 +1,14 @@
 package autotask
 
 const (
-	URI_AUTOTASK = "https://www.autotask.net"
-	//URI_LOGIN         = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=24a25cde-1336-48f9-8bc7-84a76079487d&response_type=code&scope=openid email profile&redirect_uri=https://ww6.autotask.net/Mvc/Framework/SingleSignOn.mvc/OAuth2Callback&state=ci%3d12714%26returnUrl%3d"
-	URI_TICKET_DETAIL = "/Mvc/ServiceDesk/TicketDetail.mvc?ticketID=%d"
-	URI_TASK_DETAIL   = "/Mvc/Projects/TaskDetail.mvc?taskID=%d"
-	URI_LANDING       = "/Mvc/Framework/Navigation.mvc/Landing"
+	URI_AUTOTASK       = "https://www.autotask.net"
+	URI_TICKET_DETAIL  = "%s/Mvc/ServiceDesk/TicketDetail.mvc?ticketID=%d"
+	URI_TASK_DETAIL    = "%s/Mvc/Projects/TaskDetail.mvc?taskID=%d"
+	URI_LANDING_SUFFIX = "/Mvc/Framework/Navigation.mvc/Landing" // used for waiting
+	URI_LANDING        = "%s/" + URI_LANDING_SUFFIX              // used for navigating
 )
+
+var BaseURL string = URI_AUTOTASK
 
 type AutoTasker interface {
 	LogTimes(entries TimeEntries,
