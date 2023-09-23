@@ -67,8 +67,8 @@ func initialiseConfigFile(cf string) error {
 		cobra.CheckErr(fmt.Errorf("fatal error config file: %s", err))
 	}
 
-	// Initialize Viper settings
-	setViperSetting("Your first name and last name in Auto Task (e.g Philip Fourie)", settingAutoTaskDisplayName)
+	// Initialise Viper settings
+	setViperSetting("Your first name and last name in AutoTask (e.g Philip Fourie)", settingAutoTaskDisplayName)
 	setViperSetting("Autotask date format, as configured AT preferences for your Profile, it should be defined using https://pkg.go.dev/time#pkg-constants (sorry)", settingAutoTaskDateFormat)
 	setViperSetting("Autotask day format, as shown in AT week entries when capturing Tasks, it should be defined using https://pkg.go.dev/time#pkg-constants (sorry)", settingAutoTaskDayFormat)
 	setViperSetting("Username, this is normally your company email address", settingCredentialsUsername)

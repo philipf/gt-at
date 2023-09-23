@@ -18,7 +18,14 @@ var rootCmd = &cobra.Command{
 	Long:  `Go Time - AutoTasker is a tool to help you track your time in AutoTask.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gt-at version 0.0.3")
+		// Print an error message
+		fmt.Println("Error: Invalid usage. No subcommand provided.")
+
+		// Display the help text
+		cmd.Help()
+
+		// Exit with an error code
+		os.Exit(1)
 
 	},
 }
