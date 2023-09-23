@@ -6,8 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// This variable will be populated using a build flag.
-var version string
+var version string = "0.0.7"
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
