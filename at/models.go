@@ -1,4 +1,4 @@
-package autotask
+package at
 
 import (
 	"sort"
@@ -16,6 +16,7 @@ type TimeEntry struct {
 	Summary      string
 	Project      string
 
+	// Derived properties
 	Exists             bool
 	Submitted          bool
 	Error              error
@@ -27,19 +28,21 @@ type TimeEntry struct {
 	WeekPeerLocator    interface{}
 }
 
+// NewEntry constructs a TimeEntry and calculates its derived properties
 func NewEntry(id int,
 	isTicket bool,
 	date time.Time,
 	startTimeStr string,
 	duration float32,
 	summary string,
-	project string) *TimeEntry {
+	project string,
+	dateFormat string) *TimeEntry {
 
 	e := &TimeEntry{
 		Id:           id,
 		IsTicket:     isTicket,
 		Date:         date,
-		DateStr:      date.Format("2006-01-02"),
+		DateStr:      date.Format(dateFormat),
 		StartTimeStr: startTimeStr,
 		Duration:     duration,
 		Summary:      summary,
@@ -51,6 +54,7 @@ func NewEntry(id int,
 	return e
 }
 
+// calculateDerived computes the derived properties of the TimeEntry
 func (te *TimeEntry) calculateDerived() {
 	te.DurationHours = int(te.Duration)
 	te.DurationMinutes = (te.Duration - float32(te.DurationHours)) * 60
@@ -59,9 +63,9 @@ func (te *TimeEntry) calculateDerived() {
 	te.DurationMinutesStr = strconv.Itoa(int(te.DurationMinutes))
 
 	te.WeekNo = WeekNo(te.Date)
-	te.DateStr = te.Date.Format("2006/01/02")
 }
 
+// SetError sets an error for the TimeEntry
 func (te *TimeEntry) SetError(err error) {
 	te.Error = err
 }
@@ -72,10 +76,12 @@ func (t TimeEntries) Len() int           { return len(t) }
 func (t TimeEntries) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 func (t TimeEntries) Less(i, j int) bool { return t[i].Date.Before(t[j].Date) }
 
+// SortByDate sorts the entries by their Date
 func (t TimeEntries) SortByDate() {
 	sort.Sort(t)
 }
 
+// DistinctIds returns a list of distinct Ids from the TimeEntries
 func (a TimeEntries) DistinctIds() []int {
 	seen := make(map[int]bool)
 	var result []int
@@ -100,13 +106,12 @@ func (a TimeEntries) DistinctWeekNos() []int {
 			seen[entry.WeekNo] = true
 			result = append(result, entry.WeekNo)
 		}
-
 	}
 
 	return result
 }
 
-// Split into two lists, one for tickets and one for tasks
+// SplitEntries splits the TimeEntries into two lists based on their IsTicket flag, the first list contains tickets, the second contains tasks
 func (a TimeEntries) SplitEntries() (TimeEntries, TimeEntries) {
 	tickets := make(TimeEntries, 0)
 	tasks := make(TimeEntries, 0)
@@ -122,7 +127,7 @@ func (a TimeEntries) SplitEntries() (TimeEntries, TimeEntries) {
 	return tickets, tasks
 }
 
-// Get entries by Id
+// ById retrieves entries based on their Id
 func (a TimeEntries) ById(id int) TimeEntries {
 	entries := make(TimeEntries, 0)
 
@@ -135,7 +140,7 @@ func (a TimeEntries) ById(id int) TimeEntries {
 	return entries
 }
 
-// Group entries by WeekNo
+// GroupByWeekNo groups the TimeEntries based on their week number
 func (a TimeEntries) GroupByWeekNo() map[int]TimeEntries {
 	groups := make(map[int]TimeEntries)
 
@@ -146,7 +151,7 @@ func (a TimeEntries) GroupByWeekNo() map[int]TimeEntries {
 	return groups
 }
 
-// Find all entries for a given Date
+// ByDate retrieves all entries that match a given date
 func (entries TimeEntries) ByDate(date time.Time) TimeEntries {
 	result := make(TimeEntries, 0)
 
