@@ -18,8 +18,6 @@ var initCmd = &cobra.Command{
 	Long:  `Creates the configuration file for gt-at`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
-
 		initialiseConfigFile(getConfigFile())
 	},
 }
@@ -63,9 +61,9 @@ func initialiseConfigFile(cf string) error {
 
 	viper.SetConfigFile(cf)
 	err := viper.ReadInConfig() // Read the existing config if available
-	if err != nil {
-		cobra.CheckErr(fmt.Errorf("fatal error config file: %s", err))
-	}
+	// if err != nil {
+	// 	cobra.CheckErr(fmt.Errorf("fatal error config file: %s", err))
+	// }
 
 	// Initialise Viper settings
 	setViperSetting("Your first name and last name in AutoTask (e.g Philip Fourie)", settingAutoTaskDisplayName)
