@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/philipf/gt-at/autotask"
+	"github.com/philipf/gt-at/at"
 	"github.com/playwright-community/playwright-go"
 )
 
-func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries autotask.TimeEntries) error {
+func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries at.TimeEntries, dateFormat string) error {
 	detailsSelector := page.Locator("div > .ConversationChunk > .ConversationItem .Details")
 	convs, err := detailsSelector.All()
 
@@ -42,7 +42,7 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries aut
 
 				// Extract date using slicing if the format is consistent
 				// Parse the date string
-				weekNo := getConvWeekNo(t)
+				weekNo := getConvWeekNo(t, dateFormat)
 
 				if te.WeekNo == weekNo {
 					te.WeekPeerLocator = conv
@@ -60,17 +60,17 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries aut
 	return nil
 }
 
-func getConvWeekNo(t string) int {
+func getConvWeekNo(t, dateFormat string) int {
 	input := t
 
 	dateStr := input[:10]
 
-	date, err := time.Parse("2006/01/02", dateStr)
+	date, err := time.Parse(dateFormat, dateStr)
 	if err != nil {
 		fmt.Printf("Error parsing date: %v\n", err)
 		return -1
 	}
 
-	weekNo := autotask.WeekNo(date)
+	weekNo := at.WeekNo(date)
 	return weekNo
 }

@@ -1,4 +1,4 @@
-package autotask
+package at
 
 import (
 	"encoding/json"
@@ -20,14 +20,14 @@ type RequestEntry struct {
 	Project   string    `json:"project"`
 }
 
-func UnmarshalToRequestEntries(data []byte) ([]RequestEntry, error) {
+func UnmarshalToRequestEntries(data []byte, dateFormat string) ([]RequestEntry, error) {
 	var r []RequestEntry
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func UnmarshalToTimeEntries(data []byte) (TimeEntries, error) {
-	r, err := UnmarshalToRequestEntries(data)
+func UnmarshalToTimeEntries(data []byte, dateFormat string) (TimeEntries, error) {
+	r, err := UnmarshalToRequestEntries(data, dateFormat)
 
 	if err != nil {
 		return nil, err
@@ -36,15 +36,9 @@ func UnmarshalToTimeEntries(data []byte) (TimeEntries, error) {
 	var entries TimeEntries
 
 	for _, e := range r {
-		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTime, e.Duration, e.Summary, e.Project)
+		te := NewEntry(e.Id, e.IsTicket, e.Date, e.StartTime, e.Duration, e.Summary, e.Project, dateFormat)
 		entries = append(entries, te)
 	}
 
 	return entries, nil
-}
-
-type LoadOptions struct {
-	Credentials     Credentials
-	DryRun          bool
-	UserDisplayName string
 }

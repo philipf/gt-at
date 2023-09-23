@@ -1,4 +1,4 @@
-package autotask
+package at
 
 const (
 	URI_AUTOTASK       = "https://www.autotask.net"
@@ -10,11 +10,16 @@ const (
 
 var BaseURL string = URI_AUTOTASK
 
+type CaptureOptions struct {
+	Credentials     Credentials
+	DryRun          bool
+	UserDisplayName string
+	BrowserType     string
+	Headless        bool
+	DateFormat      string
+	DayFormat       string
+}
+
 type AutoTasker interface {
-	LogTimes(entries TimeEntries,
-		credentials Credentials,
-		userLongName string,
-		browserType string,
-		headless,
-		dryRun bool) error
+	CaptureTimes(entries TimeEntries, opts CaptureOptions) error
 }

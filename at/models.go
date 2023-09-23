@@ -1,4 +1,4 @@
-package autotask
+package at
 
 import (
 	"sort"
@@ -33,13 +33,14 @@ func NewEntry(id int,
 	startTimeStr string,
 	duration float32,
 	summary string,
-	project string) *TimeEntry {
+	project string,
+	dateFormat string) *TimeEntry {
 
 	e := &TimeEntry{
 		Id:           id,
 		IsTicket:     isTicket,
 		Date:         date,
-		DateStr:      date.Format("2006/01/02"),
+		DateStr:      date.Format(dateFormat),
 		StartTimeStr: startTimeStr,
 		Duration:     duration,
 		Summary:      summary,

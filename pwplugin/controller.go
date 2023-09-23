@@ -3,40 +3,32 @@ package pwplugin
 import (
 	"fmt"
 	"log"
-	"net/url"
 
-	"github.com/philipf/gt-at/autotask"
+	"github.com/philipf/gt-at/at"
 	"github.com/philipf/gt-at/pwplugin/common"
 	"github.com/philipf/gt-at/pwplugin/projects"
 	"github.com/philipf/gt-at/pwplugin/servicedesk"
 	"github.com/playwright-community/playwright-go"
 )
 
-func NewAutoTaskPlaywright() autotask.AutoTasker {
+func NewAutoTaskPlaywright() at.AutoTasker {
 	return &autoTaskPlaywright{}
 }
 
 type autoTaskPlaywright struct{}
 
-func (atp *autoTaskPlaywright) LogTimes(
-	entries autotask.TimeEntries,
-	creds autotask.Credentials,
-	userDisplayName string,
-	browserType string,
-	headless, dryRun bool) error {
+func (atp *autoTaskPlaywright) CaptureTimes(entries at.TimeEntries, opts at.CaptureOptions) error {
 
-	log.Printf("Logging entries for a total of %v time entries\n", len(entries))
+	log.Printf("Capture entries for a total of %v time entries\n", len(entries))
 
-	err, browser := common.InitPlaywright(false, browserType, headless)
+	err, browser := common.InitPlaywright(false, opts.BrowserType, opts.Headless)
 	defer browser.Close()
 
 	if err != nil {
 		return fmt.Errorf("could not init playwright: %v", err)
 	}
 
-	ctx, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		//BaseURL: autotask.BaseURL,
-	})
+	ctx, err := browser.NewContext(playwright.BrowserNewContextOptions{})
 
 	if err != nil {
 		return fmt.Errorf("could not create context: %v", err)
@@ -44,19 +36,19 @@ func (atp *autoTaskPlaywright) LogTimes(
 
 	page, err := ctx.NewPage()
 	if err != nil {
-		log.Fatalf("could not create page: %v", err)
+		return fmt.Errorf("could not create page: %v", err)
 	}
 
-	err = gotoAutoTask(page, creds.Username)
+	err = gotoAutoTask(page, opts.Credentials.Username)
 	if err != nil {
 		return fmt.Errorf("could not goto autotask: %v", err)
 	}
 
-	loginToEntra(page, creds.Username, creds.Password)
+	loginToEntra(page, opts.Credentials.Username, opts.Credentials.Password)
 
-	log.Println("Log in progress, MFA might be required, waiting for AT Landing Page to load")
+	log.Println("Login progress, MFA might be required, waiting for AT Landing Page to load")
 
-	err = page.WaitForURL("*"+autotask.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
+	err = page.WaitForURL("*"+at.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
 		Timeout: playwright.Float(120 * 1000),
 	})
 
@@ -64,22 +56,29 @@ func (atp *autoTaskPlaywright) LogTimes(
 		return fmt.Errorf("could not wait for url: %v", err)
 	}
 
-	log.Println("logged in")
+	log.Println("Logged in")
 
-	autotask.BaseURL = getBaseURL(page.URL())
+	at.BaseURL = at.GetBaseURL(page.URL())
 
-	logEntries(entries, dryRun, page, userDisplayName)
-	entries.PrintSummary()
+	if isTimeSheetSubmitted(page) {
+		log.Println("Time sheet already submitted, skipping")
+		return nil
+	}
 
+	captureEntries(entries, opts.DryRun, page, opts.UserDisplayName, opts.DateFormat, opts.DayFormat)
 	logout(page)
 
-	log.Println("End of logTimes")
+	log.Println("End of CaptureTimes")
 
 	return nil
 }
 
+func isTimeSheetSubmitted(page playwright.Page) bool {
+	return page.GetByText("Recall (Un-submit)") != nil
+}
+
 func gotoAutoTask(page playwright.Page, username string) error {
-	_, err := page.Goto(autotask.URI_AUTOTASK)
+	_, err := page.Goto(at.URI_AUTOTASK)
 
 	if err != nil {
 		return err
@@ -97,99 +96,26 @@ func gotoAutoTask(page playwright.Page, username string) error {
 	return nil
 }
 
-func logEntries(entries autotask.TimeEntries,
+func captureEntries(entries at.TimeEntries,
 	dryRun bool,
 	page playwright.Page,
-	userDisplayName string) {
+	userDisplayName, dateFormat, dayFormat string) {
 	tickets, tasks := entries.SplitEntries()
 
 	if !dryRun {
-		err := servicedesk.LogTimeEntries(page, userDisplayName, tickets)
+		err := servicedesk.Capture(page, userDisplayName, tickets, dateFormat)
 
 		if err != nil {
-			log.Printf("could not log tickets: %v\n", err)
+			log.Printf("could not capture tickets: %v\n", err)
 		}
 
-		err = projects.LogTimeEntries(page, userDisplayName, tasks)
+		err = projects.Capture(page, userDisplayName, tasks, dateFormat, dayFormat)
 
 		if err != nil {
-			log.Printf("could not log tasks: %v\n", err)
+			log.Printf("could not capture tasks: %v\n", err)
 		}
 
 	} else {
-		log.Println("Dry run, skipping logTimeEntry")
+		log.Println("Dry run, skipping")
 	}
-}
-
-func getBaseURL(rawURL string) string {
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		log.Printf("could not parse url: %v\n", err)
-		return ""
-	}
-
-	baseURL := u.Scheme + "://" + u.Host
-	return baseURL
-}
-
-func loginToEntra(page playwright.Page, user, password string) {
-	if user != "" {
-		// auto fill if available
-		page.Locator("#i0116").Fill(user)    // Username
-		page.Locator("#idSIButton9").Click() // Click Next button
-	}
-
-	if password != "" {
-		// auto fill if available
-		page.Locator("#i0118").Fill(password) // Password
-		page.Locator("#idSIButton9").Click()  // Click Sign In button
-	}
-}
-
-func logout(page playwright.Page) {
-	log.Println("Logging out")
-	page.Goto(fmt.Sprintf(autotask.URI_LANDING, autotask.BaseURL))
-
-	page.WaitForURL("*"+autotask.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
-		WaitUntil: playwright.WaitUntilStateLoad,
-		Timeout:   playwright.Float(5 * 1000),
-	})
-
-	log.Println("Landing page loaded")
-
-	err := page.Locator("[data-eii='05008GVH']").Hover() //hover to enable elements below
-	if err != nil {
-		log.Printf("could not hover over profile: %v\n", err)
-	}
-
-	err = page.Locator("[data-eii='0100014V']").Click() // profile logout
-	if err != nil {
-		log.Printf("could not click profile logout: %v\n", err)
-	}
-
-	setStatusOutLocatorCloseButton := page.Locator("div.Dialog1 div.DialogTitleBarIcon")
-	setStatusOutLocatorCloseButton.WaitFor(playwright.LocatorWaitForOptions{
-		Timeout: playwright.Float(2 * 1000),
-	})
-
-	if err != nil {
-		log.Printf("could not find status out (WaitFor): %v\n", err)
-	}
-
-	setStatusOut, err := setStatusOutLocatorCloseButton.IsVisible()
-	if err != nil {
-		log.Printf("could not find status out (IsVisible): %v\n", err)
-	}
-
-	if setStatusOut {
-		err = setStatusOutLocatorCloseButton.Click()
-		if err != nil {
-			log.Printf("could not click status out: %v\n", err)
-		}
-	}
-
-	log.Println("Waiting for logout to complete")
-	page.WaitForURL("*Authentication.mvc*")
-
-	log.Println("Logged out")
 }

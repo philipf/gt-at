@@ -1,4 +1,4 @@
-package autotask
+package at
 
 import "time"
 
@@ -27,10 +27,6 @@ func SundayOfTheWeek(t time.Time) time.Time {
 	// Since Sunday = 0 in time.Weekday, it gives the exact offset we need.
 	offset := int(t.Weekday())
 	return t.AddDate(0, 0, -offset)
-}
-
-func FormatShortDate(t time.Time) string {
-	return t.Format("Mon 01/02")
 }
 
 func InferYear(month time.Month, windowInMonths int, dt time.Time) int {
