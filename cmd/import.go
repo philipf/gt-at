@@ -12,18 +12,18 @@ import (
 )
 
 var (
+	// Filename for JSON import and flag to indicate if only a report is required.
 	jsonfile   string
 	reportOnly bool
 )
 
+// importCmd represents the import command for Cobra
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Import a file of time entries into AutoTask",
 	Long:  `Import a file of time entries into AutoTask`,
-
 	Run: func(cmd *cobra.Command, args []string) {
 		isConfigured()
-
 		err := load(jsonfile)
 		cobra.CheckErr(err)
 	},
@@ -32,10 +32,12 @@ var importCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(importCmd)
 
+	// Flags for the import command.
 	importCmd.Flags().StringVarP(&jsonfile, "filename", "f", "/tmp/time.json", "name of json file that should be imported")
 	importCmd.Flags().BoolVarP(&reportOnly, "reportOnly", "r", false, "print a summary of the time entries, but doesn't import them")
 }
 
+// load processes the file and imports it.
 func load(filename string) error {
 	log.Printf("Loading file: %v\n", filename)
 	defer log.Println("Done")
@@ -64,9 +66,14 @@ func load(filename string) error {
 	return nil
 }
 
+// getLoadOptions retrieves options for the load from configuration.
 func getLoadOptions() at.CaptureOptions {
+	// Assuming that getConfigFile() and other "setting..." constants are defined elsewhere in the code.
 	viper.SetConfigFile(getConfigFile())
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		cobra.CheckErr(fmt.Errorf("fatal error config file: %s \n", err))
+	}
 
 	opts := at.CaptureOptions{
 		Credentials: at.Credentials{
@@ -83,8 +90,9 @@ func getLoadOptions() at.CaptureOptions {
 	return opts
 }
 
+// readFile reads and unmarshals a JSON file into time entries.
 func readFile(filename, dateFormat string) (at.TimeEntries, error) {
-	// make sure the file exists
+	// Ensure the file exists.
 	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return nil, fmt.Errorf("file does not exist: %v, %v", filename, err)

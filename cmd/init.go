@@ -26,7 +26,6 @@ var initCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(initCmd)
-
 }
 
 func isConfigured() {
@@ -34,14 +33,18 @@ func isConfigured() {
 
 	_, err := os.Stat(cfgFile)
 
-	if os.IsNotExist(err) {
-		cobra.CheckErr(fmt.Errorf("no config file found, please run `gt-at init` first: %v", err))
+	// Check if file doesn't exist or there's another error accessing the file
+	if err != nil {
+		if os.IsNotExist(err) {
+			cobra.CheckErr(fmt.Errorf("no config file found, please run `gt-at init` first: %v", err))
+		} else {
+			cobra.CheckErr(fmt.Errorf("error accessing config file: %v", err))
+		}
 	}
 }
 
 func getConfigFile() string {
 	if cfgFile == "" {
-
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			cobra.CheckErr(fmt.Errorf("could not get user home directory: %v", err))
@@ -59,15 +62,19 @@ func initialiseConfigFile(cf string) error {
 	setViperDefaults()
 
 	viper.SetConfigFile(cf)
-	viper.ReadInConfig()
+	err := viper.ReadInConfig() // Read the existing config if available
+	if err != nil {
+		cobra.CheckErr(fmt.Errorf("fatal error config file: %s", err))
+	}
 
+	// Initialize Viper settings
 	setViperSetting("Your first name and last name in Auto Task (e.g Philip Fourie)", settingAutoTaskDisplayName)
 	setViperSetting("Autotask date format, as configured AT preferences for your Profile, it should be defined using https://pkg.go.dev/time#pkg-constants (sorry)", settingAutoTaskDateFormat)
 	setViperSetting("Autotask day format, as shown in AT week entries when capturing Tasks, it should be defined using https://pkg.go.dev/time#pkg-constants (sorry)", settingAutoTaskDayFormat)
 	setViperSetting("Username, this is normally your company email address", settingCredentialsUsername)
 	setViperSetting("Browser type (chromium|firefox|webkit)", settingPlaywrightBrowser)
 
-	err := viper.WriteConfigAs(cf)
+	err = viper.WriteConfigAs(cf)
 	if err != nil {
 		return fmt.Errorf("cannot write config file in user's home directory:  [%v]", err)
 	}
@@ -112,7 +119,6 @@ func prompt(question, defaultValue string) (string, error) {
 	}
 
 	v, err := readLine()
-
 	if err != nil {
 		return "", err
 	}

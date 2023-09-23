@@ -7,7 +7,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-func InitPlaywright(install bool, useBrowserType string, headless bool) (error, playwright.Browser) {
+func InitPlaywright(install bool, useBrowserType string, headless bool) (playwright.Browser, error) {
 
 	log.Println("Initiating playwright")
 
@@ -20,14 +20,14 @@ func InitPlaywright(install bool, useBrowserType string, headless bool) (error, 
 		log.Println("Installing playwright")
 		err := playwright.Install(&runOpts)
 		if err != nil {
-			return err, nil
+			return nil, err
 		}
 		log.Println("Installed playwright")
 	}
 
 	pw, err := playwright.Run(&runOpts)
 	if err != nil {
-		return fmt.Errorf("could not start playwright: %v", err), nil
+		return nil, fmt.Errorf("could not start playwright: %v", err)
 	}
 
 	browserOpts := playwright.BrowserTypeLaunchOptions{
@@ -47,8 +47,8 @@ func InitPlaywright(install bool, useBrowserType string, headless bool) (error, 
 	browser, err := browserType.Launch(browserOpts)
 
 	if err != nil {
-		return fmt.Errorf("could not launch browser: %v", err), nil
+		return nil, fmt.Errorf("could not launch browser: %v", err)
 	}
 
-	return err, browser
+	return browser, nil
 }

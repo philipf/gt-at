@@ -10,6 +10,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
+// MarkExisiting goes through timeEntries and marks them as existing if they are found on the page.
 func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries at.TimeEntries, dateFormat string) error {
 	detailsSelector := page.Locator("div > .ConversationChunk > .ConversationItem .Details")
 	convs, err := detailsSelector.All()
@@ -21,7 +22,6 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries at.
 	log.Printf("Found %v conversations\n", len(convs))
 
 	for _, te := range timeEntries {
-
 		for _, conv := range convs {
 			author := conv.Locator("div > .Author div.Text2")
 			authorName, err := author.TextContent()
@@ -40,8 +40,6 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries at.
 					continue
 				}
 
-				// Extract date using slicing if the format is consistent
-				// Parse the date string
 				weekNo := getConvWeekNo(t, dateFormat)
 
 				if te.WeekNo == weekNo {
@@ -60,14 +58,14 @@ func MarkExisiting(page playwright.Page, userDisplayName string, timeEntries at.
 	return nil
 }
 
+// getConvWeekNo parses the date string to extract its week number.
 func getConvWeekNo(t, dateFormat string) int {
-	input := t
-
-	dateStr := input[:10]
+	dateStr := t[:len(dateFormat)]
 
 	date, err := time.Parse(dateFormat, dateStr)
 	if err != nil {
-		fmt.Printf("Error parsing date: %v\n", err)
+		// Logging instead of silently ignoring, this might provide useful debugging info.
+		log.Printf("Error parsing date: %v\n", err)
 		return -1
 	}
 

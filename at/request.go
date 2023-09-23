@@ -5,11 +5,13 @@ import (
 	"time"
 )
 
+// Credentials holds the authentication details, currently unused in this snippet.
 type Credentials struct {
 	Username string
 	Password string
 }
 
+// RequestEntry represents a single entry as received in a JSON request.
 type RequestEntry struct {
 	Id        int       `json:"id"`
 	IsTicket  bool      `json:"isTicket"`
@@ -20,14 +22,16 @@ type RequestEntry struct {
 	Project   string    `json:"project"`
 }
 
-func UnmarshalToRequestEntries(data []byte, dateFormat string) ([]RequestEntry, error) {
+// UnmarshalToRequestEntries converts JSON data into a slice of RequestEntry.
+func UnmarshalToRequestEntries(data []byte) ([]RequestEntry, error) {
 	var r []RequestEntry
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
+// UnmarshalToTimeEntries converts JSON data into a TimeEntries.
 func UnmarshalToTimeEntries(data []byte, dateFormat string) (TimeEntries, error) {
-	r, err := UnmarshalToRequestEntries(data, dateFormat)
+	r, err := UnmarshalToRequestEntries(data)
 
 	if err != nil {
 		return nil, err
