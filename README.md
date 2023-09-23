@@ -1,3 +1,6 @@
+![Build workflow](https://github.com/philipf/gt-at/actions/workflows/go.yml/badge.svg)
+![Release workflow](https://github.com/philipf/gt-at/actions/workflows/release.yml/badge.svg)
+
 # Go Time - AutoTasker (gt-at)
 
 Go Time - AutoTasker (gt-at) is a CLI utility designed to simplify timesheet capture in AutoTask by Datto. Leveraging the power of playwright, gt-at makes time tracking easier for tasks (projects) and tickets (service desk) within AutoTask.
@@ -19,6 +22,20 @@ Go Time - AutoTasker (gt-at) is a CLI utility designed to simplify timesheet cap
 While AutoTask provides extensive functionality, capturing time can sometimes be a repetitive and time-consuming task. `gt-at` aims to reduce the friction involved in this process, allowing users to seamlessly capture their time for tasks and tickets.
 
 ## Installation
+Choose one of the following installation methods that best suits your needs.
+
+### From Releases
+Download the latest version for your operation system from [Releases](https://github.com/philipf/gt-at/releases)
+
+### Go Install
+1. Ensure you have Golang installed.
+2. Run the following command:
+
+```bash
+go install github.com/philipf/gt-at@latest
+```
+
+### Build from source
 
 1. Ensure you have Golang installed.
 2. Clone the repository:
@@ -66,8 +83,6 @@ For detailed information on a command:
 gt-at [command] --help
 ```
 
-
-
 ## Initial Setup
 
 Before you start using `gt-at`, you'll need to set up a configuration file. Without this configuration, the CLI application won't run.
@@ -83,12 +98,16 @@ gt-at init
 ```
 
 
-2. The initialization process will prompt you for various configuration details. Provide the necessary information as illustrated below:
+2. The initialization process will prompt you for various configuration details. 
+Provide the necessary information as illustrated below:
 
 ```
 Your first name and last name in AutoTask (e.g Philip Fourie):John Smith
+
 Autotask date format, as configured in AT preferences for your Profile. Define it using [Go's Time Format Specifiers](https://pkg.go.dev/time#pkg-constants) [Default: 2006/01/02]:
+
 Autotask day format, as shown in AT week entries when capturing Tasks. Define it using [Go's Time Format Specifiers](https://pkg.go.dev/time#pkg-constants) [Default: Mon 01/02]:
+
 Username, typically your company email address: name@yourcompany.com
 Browser type (options: chromium|firefox|webkit) [Default: chromium]:
 ```
@@ -192,6 +211,15 @@ opts := // ... your options configuration
 
 err := autoTasker.CaptureTimes(entries, opts)
 ```
+
+## Tech Stack
+- Go 1.21.1
+- [Playwright](https://playwright.dev/)
+- [Playwright for Go](https://github.com/playwright-community/playwright-go)
+- [Cobra](https://github.com/spf13/cobra)
+- [Viper](https://github.com/spf13/viper)
+- [GoReleaser](https://goreleaser.com/)
+- [ASCII Table Writer](github.com/olekukonko/tablewriter)
 
 
 ## Contributing

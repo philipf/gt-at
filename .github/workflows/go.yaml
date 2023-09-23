@@ -1,6 +1,9 @@
-name: gt Build and Test
+name: Build and Test
 
-on: [push]
+on:
+  push:
+    tags-ignore:
+      - '**'
 
 jobs:
   build:
