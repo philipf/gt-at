@@ -1,5 +1,5 @@
-![Build workflow](https://github.com/philipf/gt-at/actions/workflows/go.yml/badge.svg)
-![Release workflow](https://github.com/philipf/gt-at/actions/workflows/release.yml/badge.svg)
+[![Build and Test](https://github.com/philipf/gt-at/actions/workflows/go.yaml/badge.svg)](https://github.com/philipf/gt-at/actions/workflows/go.yaml)
+[![Releases](https://github.com/philipf/gt-at/actions/workflows/release.yaml/badge.svg)](https://github.com/philipf/gt-at/actions/workflows/release.yaml)
 
 # Go Time - AutoTasker (gt-at)
 
