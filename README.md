@@ -1,25 +1,32 @@
 [![Build and Test](https://github.com/philipf/gt-at/actions/workflows/go.yaml/badge.svg)](https://github.com/philipf/gt-at/actions/workflows/go.yaml)
 [![Releases](https://github.com/philipf/gt-at/actions/workflows/release.yaml/badge.svg)](https://github.com/philipf/gt-at/actions/workflows/release.yaml)
 
-# Go Time - AutoTasker (gt-at)
+# gt-at
 
-Go Time - AutoTasker (gt-at) is a CLI utility designed to simplify timesheet capture in AutoTask by Datto. Leveraging the power of playwright, gt-at makes time tracking easier for tasks (projects) and tickets (service desk) within AutoTask.
-
-## Table of Contents
-
-- [Purpose](#purpose)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Commands](#commands)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [Importing Time Entries](#importing-time-entries)
-- [Using as a Go Package](#using-as-a-go-package)
-- [License](#license)
 
 ## Purpose
+I have been losing precious time by dealing with the slow and cumbersome AutoTask (Datto / Kaseya) web interface, `gt-at` solves this problem by allowing you to capture time outside of AutoTask and then import it in bulk using the CLI tool or the Go package (SDK). 
 
-While AutoTask provides extensive functionality, capturing time can sometimes be a repetitive and time-consuming task. `gt-at` aims to reduce the friction involved in this process, allowing users to seamlessly capture their time for tasks and tickets.
+It uses Playwright to automate the browser and capture the time entries.
+
+Why not use the AutoTask REST API? Firstly, I need access to the API key in my organisation, and secondly, the key provides full system administrator access, which I prefer not to have.
+
+### Features
+- Import time entries from a JSON file
+- Capture time entries from your application using the Go package.
+- Login to AutoTask using Azure AD / Entra ID.
+- Supports both tickets (service desk) and tasks (projects).
+- Supports both Chromium, Firefox and Webkit browsers.
+- Supports both Windows, Linux, and macOS operating systems.
+
+### Known limitations
+- Entries cannot be deleted; this is by design. If you need to delete an entry, do it manually in AutoTask.
+- If a timesheet is already submitted for the week, `gt-at` will give up. You can recall the submission in AutoTask and try again.
+
+### Disclaimers
+- This project is not affiliated with AutoTask or Datto in any way. It is a personal project that I use to make my life easier. I hope it can do the same for you.
+- I have only tested this on my AutoTask account using Windows 10 and the chromium driver. It may not work for you. If you find any bugs, please raise an issue or even better, a pull request.
+
 
 ## Installation
 Choose one of the following installation methods that best suits your needs.
@@ -98,7 +105,7 @@ gt-at init
 ```
 
 
-2. The initialization process will prompt you for various configuration details. 
+2. The initialisation process will prompt you for various configuration details. 
 Provide the necessary information as illustrated below:
 
 ```
@@ -143,13 +150,13 @@ gt-at import -f /path/to/your/time_entries.json --reportOnly
 ```
 
 
-## Importing Time Entries
+## Importing Time Entries using the CLI and JSON
 
-Using the `import` command, you can batch import time entries from a JSON file. This feature is particularly useful when you have multiple entries to be captured at once.
+You can batch import time entries from a JSON file using the `import` command. .
 
 ### File Format
 
-The expected JSON file format for importing time entries is an array of objects, where each object represents a time entry.
+The expected JSON file format for importing time entries is an array of objects, each representing a time entry.
 
 Here's the structure of a time entry object:
 
@@ -187,8 +194,6 @@ Here's the structure of a time entry object:
 
 If you're developing a Golang application and wish to integrate `gt-at` functionalities, you can import and use it as a package. This allows for seamless integration of time entry capture within your application logic.
 
-### How to Use
-
 1. First, ensure you have `gt-at` added as a dependency in your Go project. If not, you can do so with:
 
 ```bash
@@ -211,6 +216,12 @@ opts := // ... your options configuration
 
 err := autoTasker.CaptureTimes(entries, opts)
 ```
+
+## AutoTask IDs
+
+You'll notice the `id` field in the JSON and SDK, this refers to either a Task or Ticket ID in AutoTask. You can find this ID in the URL when viewing the Task or Ticket in AutoTask.
+
+This means you must manually create the Task or Ticket in AutoTask before you can import time entries for it. It also implies that you have to keep track of the IDs yourself.
 
 ## Tech Stack
 - Go 1.21.1
