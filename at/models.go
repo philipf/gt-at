@@ -72,12 +72,20 @@ func (te *TimeEntry) SetError(err error) {
 
 type TimeEntries []*TimeEntry
 
-func (t TimeEntries) Len() int           { return len(t) }
-func (t TimeEntries) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t TimeEntries) Less(i, j int) bool { return t[i].Date.Before(t[j].Date) }
+func (t TimeEntries) Len() int { return len(t) }
 
-// SortByDate sorts the entries by their Date
-func (t TimeEntries) SortByDate() {
+func (t TimeEntries) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+
+func (t TimeEntries) Less(i, j int) bool {
+	// If the Date is the same, compare by StartTimeStr
+	if t[i].Date.Equal(t[j].Date) {
+		return t[i].StartTimeStr < t[j].StartTimeStr
+	}
+	return t[i].Date.Before(t[j].Date)
+}
+
+// SortByDateAndTime sorts the entries by their Date and StartTimeStr
+func (t TimeEntries) SortByDateAndTime() {
 	sort.Sort(t)
 }
 

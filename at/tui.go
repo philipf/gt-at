@@ -10,6 +10,7 @@ import (
 // PrintSummary prints a summary table of the time entries.
 func (entries TimeEntries) PrintSummary() {
 	// Initialise a table writer using the log's writer.
+	entries.SortByDateAndTime()
 	table := tablewriter.NewWriter(log.Writer())
 	table.SetAutoWrapText(false)
 	// Set the table header.
