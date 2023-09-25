@@ -83,7 +83,25 @@ func (atp *autoTaskPlaywright) CaptureTimes(entries at.TimeEntries, opts at.Capt
 
 // isSubmitted checks if the timesheet is already submitted.
 func isSubmitted(page playwright.Page) bool {
-	return page.GetByText("Recall (Un-submit)") != nil
+	count, err := page.GetByText("Recall (Un-submit)").Count()
+
+	if err != nil {
+		log.Printf("could not get count: %v\n", err)
+		return false
+	}
+
+	isVisble, err := page.GetByText("Recall (Un-submit)").IsVisible()
+
+	if err != nil {
+		log.Printf("could not visible: %v\n", err)
+		return false
+	}
+
+	if count == 0 || !isVisble {
+		return false
+	}
+
+	return true
 }
 
 // gotoAutoTask navigates the browser to the AutoTask URI.
