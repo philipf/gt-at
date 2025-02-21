@@ -3,6 +3,7 @@ package pwplugin
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/philipf/gt-at/at"
 	"github.com/playwright-community/playwright-go"
@@ -19,7 +20,9 @@ func logout(page playwright.Page) {
 	}
 
 	// Wait for the landing page to fully load
-	err = page.WaitForURL("*"+at.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
+	var urlRegEx = regexp.MustCompile(".*" + at.URI_LANDING_SUFFIX)
+
+	err = page.WaitForURL(urlRegEx, playwright.PageWaitForURLOptions{
 		WaitUntil: playwright.WaitUntilStateLoad,
 		Timeout:   playwright.Float(5 * 1000),
 	})
@@ -67,7 +70,8 @@ func logout(page playwright.Page) {
 
 	// Wait for the logout process to complete and the authentication page to appear
 	log.Println("Waiting for logout to complete")
-	err = page.WaitForURL("*Authentication.mvc*")
+	urlRegEx = regexp.MustCompile(".*Authenticate")
+	err = page.WaitForURL(urlRegEx)
 	if err != nil {
 		log.Printf("could not wait for authentication page: %v\n", err)
 	}

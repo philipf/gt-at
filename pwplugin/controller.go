@@ -3,6 +3,7 @@ package pwplugin
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/philipf/gt-at/at"
 	"github.com/philipf/gt-at/pwplugin/common"
@@ -49,6 +50,8 @@ func (atp *autoTaskPlaywright) CaptureTimes(entries at.TimeEntries, opts at.Capt
 	}
 
 	// Log in to Entra
+	log.Printf("Login to Entra\n")
+
 	err = loginToEntra(page, opts.Credentials.Username, opts.Credentials.Password)
 	if err != nil {
 		return fmt.Errorf("could not login to entra: %v", err)
@@ -56,7 +59,8 @@ func (atp *autoTaskPlaywright) CaptureTimes(entries at.TimeEntries, opts at.Capt
 
 	// Wait for landing page after logging in (MFA might be required)
 	log.Println("Login progress, MFA might be required, waiting for AT Landing Page to load")
-	err = page.WaitForURL("*"+at.URI_LANDING_SUFFIX, playwright.PageWaitForURLOptions{
+	urlRegEx := regexp.MustCompile(".*LandingPage")
+	err = page.WaitForURL(urlRegEx, playwright.PageWaitForURLOptions{
 		Timeout: playwright.Float(120 * 1000),
 	})
 	if err != nil {
@@ -111,7 +115,8 @@ func gotoAutoTask(page playwright.Page, username string) error {
 		return err
 	}
 
-	err = page.WaitForURL("*Authentication.mvc*")
+	var urlRegEx = regexp.MustCompile(".*Authenticate")
+	err = page.WaitForURL(urlRegEx)
 	if err != nil {
 		return err
 	}

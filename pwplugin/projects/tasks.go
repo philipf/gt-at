@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/philipf/gt-at/at"
@@ -46,7 +47,7 @@ func captureByTaskId(page playwright.Page, taskId int, entries at.TimeEntries, u
 	}
 
 	if err != nil {
-		if err.Error() == "TimeoutError" {
+		if strings.Contains(err.Error(), "timeout") {
 			log.Println("Timeout waiting for first conversation details to load")
 		} else {
 			return fmt.Errorf("captureByTaskId: could not find details: %v", err)

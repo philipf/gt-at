@@ -3,6 +3,7 @@ package servicedesk
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/philipf/gt-at/at"
 	"github.com/philipf/gt-at/pwplugin/common"
@@ -42,7 +43,7 @@ func captureByTicketId(page playwright.Page, ticketId int, entries at.TimeEntrie
 	}
 
 	if err != nil {
-		if err.Error() == "TimeoutError" {
+		if strings.Contains(err.Error(), "timeout") {
 			log.Println("Timeout waiting for first conversation details to load")
 		} else {
 			return fmt.Errorf("logTimeEntries: could not find details: %v", err)
