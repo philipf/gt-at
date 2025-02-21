@@ -46,12 +46,13 @@ func captureByTaskId(page playwright.Page, taskId int, entries at.TimeEntries, u
 	}
 
 	if err != nil {
-		if playwright.TimeoutError.Is(err) {
+		if err.Error() == "TimeoutError" {
 			log.Println("Timeout waiting for first conversation details to load")
 		} else {
 			return fmt.Errorf("captureByTaskId: could not find details: %v", err)
 		}
 	}
+
 	log.Println("Conversations Loaded")
 
 	// Build an array of ticket entries for a given taskId

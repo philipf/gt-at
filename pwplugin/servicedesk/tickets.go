@@ -42,7 +42,7 @@ func captureByTicketId(page playwright.Page, ticketId int, entries at.TimeEntrie
 	}
 
 	if err != nil {
-		if playwright.TimeoutError.Is(err) {
+		if err.Error() == "TimeoutError" {
 			log.Println("Timeout waiting for first conversation details to load")
 		} else {
 			return fmt.Errorf("logTimeEntries: could not find details: %v", err)
