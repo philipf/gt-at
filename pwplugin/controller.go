@@ -23,7 +23,7 @@ func (atp *autoTaskPlaywright) CaptureTimes(entries at.TimeEntries, opts at.Capt
 	log.Printf("Capture entries for a total of %v time entries\n", len(entries))
 
 	// Initialize playwright
-	browser, err := common.InitPlaywright(false, opts.BrowserType, opts.Headless)
+	browser, err := common.InitPlaywright(true, opts.BrowserType, opts.Headless)
 	if err != nil {
 		return fmt.Errorf("could not init playwright: %v", err)
 	}
