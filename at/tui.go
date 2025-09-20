@@ -12,9 +12,9 @@ func (entries TimeEntries) PrintSummary() {
 	// Initialise a table writer using the log's writer.
 	entries.SortByDateAndTime()
 	table := tablewriter.NewWriter(log.Writer())
-	table.SetAutoWrapText(false)
+	// table.SetAutoWrapText(false)
 	// Set the table header.
-	table.SetHeader([]string{"#", "AT-ID", "T", "Date", "Start", "Hrs", "EXS", "SAV", "ERR", "Project"})
+	table.Header([]string{"#", "AT-ID", "T", "Date", "Start", "Hrs", "EXS", "SAV", "ERR", "Project"})
 
 	var total float32 = 0.0
 	for i, e := range entries {
@@ -42,7 +42,7 @@ func (entries TimeEntries) PrintSummary() {
 	}
 
 	// Set the table footer to show the total duration.
-	table.SetFooter([]string{"", "", "", "Total", fmt.Sprintf("%.2f", total), "", "", "", "", "EOF"})
+	table.Footer([]string{"", "", "", "Total", fmt.Sprintf("%.2f", total), "", "", "", "", "EOF"})
 	table.Render()
 }
 
