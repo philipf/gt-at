@@ -3,8 +3,8 @@ module github.com/philipf/gt-at
 go 1.23.0
 
 require (
+	github.com/playwright-community/playwright-go v0.5200.1
 	github.com/olekukonko/tablewriter v1.1.0
-	github.com/playwright-community/playwright-go v0.5101.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.21.0
 )
